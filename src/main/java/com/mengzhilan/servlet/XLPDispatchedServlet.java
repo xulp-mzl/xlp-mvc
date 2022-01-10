@@ -8,6 +8,7 @@ import com.mengzhilan.mapping.RequestMappingMap;
 import com.mengzhilan.mapping.RequestPathUtils;
 import org.xlp.utils.XLPCharsetUtil;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,28 @@ import java.util.Locale;
  */
 public class XLPDispatchedServlet extends HttpServlet {
     private static final long serialVersionUID = -8887930386546188053L;
+
+    /**
+     * Tomcat的默认servlet名称
+     */
+    public static final String COMMON_DEFAULT_SERVLET_NAME = "default";
+
+    /**
+     * 标记是否在web.xml中配置了用默认servlet处理静态资源参数名称
+     */
+    public static final String HAS_CONFIGURE_DDEFAULT_SERVLET_PARAETER = "canUseDefault";
+
+    /**
+     * 标记是否在web.xml中配置了用默认servlet处理静态资源参数,值为true时，配置了，否则没有配置
+     */
+    public boolean hasConfiguredDefaultServlet = false;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        String initParameter = config.getInitParameter(HAS_CONFIGURE_DDEFAULT_SERVLET_PARAETER);
+        hasConfiguredDefaultServlet = "true".equals(initParameter);
+    }
 
     @Override
     protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
@@ -67,7 +90,14 @@ public class XLPDispatchedServlet extends HttpServlet {
                 httpServletResponse.sendError(400, e.getMessage());
             }
         } else {
-            httpServletResponse.sendError(404);
+            //配置了用默认servlet处理静态资源参数, 则未找到所要访问的资源，直接返回404
+            if (hasConfiguredDefaultServlet){
+                httpServletResponse.sendError(404);
+            } else {
+                //未配置了用默认servlet处理静态资源参数, 则未找到所要访问的资源，则用默认servlet处理
+                httpServletRequest.getServletContext().getNamedDispatcher(COMMON_DEFAULT_SERVLET_NAME)
+                        .forward(httpServletRequest, httpServletResponse);
+            }
         }
     }
 }
