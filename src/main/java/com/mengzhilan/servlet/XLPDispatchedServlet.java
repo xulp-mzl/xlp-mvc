@@ -92,7 +92,8 @@ public class XLPDispatchedServlet extends HttpServlet {
                      // 判断返回值是否是数字类型，或基础类型，或包装类型，或字符串类型
                      if (XLPPackingTypeUtil.isNumber(value)
                          || XLPPackingTypeUtil.isOtherRawOrPackingType(cs)
-                         || value instanceof CharSequence){
+                         || value instanceof CharSequence
+                         || value instanceof Json){
                          response = value.toString();
                      } else {
                          response = Json.toJsonString(value);
