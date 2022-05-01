@@ -6,7 +6,10 @@ import com.mengzhilan.handler.RequestMappingInfoHandler;
 import com.mengzhilan.mapping.RequestMappingInfo;
 import com.mengzhilan.mapping.RequestMappingMap;
 import com.mengzhilan.mapping.RequestPathUtils;
+
+import org.xlp.json.Json;
 import org.xlp.utils.XLPCharsetUtil;
+import org.xlp.utils.XLPPackingTypeUtil;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -84,7 +87,17 @@ public class XLPDispatchedServlet extends HttpServlet {
             try {
                 Object value = new RequestMappingInfoHandler().handle(httpServletRequest, httpServletResponse, info);
                 if (value != null){
-                    httpServletResponse.getWriter().write(value.toString());
+                	 String response;
+                     Class<?> cs = value.getClass();
+                     // 判断返回值是否是数字类型，或基础类型，或包装类型，或字符串类型
+                     if (XLPPackingTypeUtil.isNumber(value)
+                         || XLPPackingTypeUtil.isOtherRawOrPackingType(cs)
+                         || value instanceof CharSequence){
+                         response = value.toString();
+                     } else {
+                         response = Json.toJsonString(value);
+                     }
+                     httpServletResponse.getWriter().write(response);
                 }
             } catch (ParameterNotExistException e){
                 httpServletResponse.sendError(400, e.getMessage());
