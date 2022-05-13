@@ -1,8 +1,15 @@
 package com.mengzhilan.handler;
 
-import com.mengzhilan.annotation.*;
-import com.mengzhilan.mapping.RequestMappingInfo;
-import com.mengzhilan.mapping.RequestPathUtils;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xlp.assertion.AssertUtils;
@@ -11,15 +18,13 @@ import org.xlp.utils.XLPCharsetUtil;
 import org.xlp.utils.XLPStringUtil;
 import org.xlp.utils.io.XLPIOUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import com.mengzhilan.annotation.PathVariable;
+import com.mengzhilan.annotation.RequestBean;
+import com.mengzhilan.annotation.RequestBody;
+import com.mengzhilan.annotation.RequestHeader;
+import com.mengzhilan.annotation.RequestParam;
+import com.mengzhilan.mapping.RequestMappingInfo;
+import com.mengzhilan.mapping.RequestPathUtils;
 
 /**
  * Create by xlp on 2021/12/23
@@ -211,11 +216,15 @@ public class ValueHandlerBuilder {
      */
     public ValueHandlerBuilder requestBody(){
         if (RequestBody.class == parameterInfo.getAnnotationClass()){
-            String body;
+            String body = null;
             try(InputStream inputStream = request.getInputStream()){
-                body = XLPIOUtil.toString(inputStream,false, requestCharsetName);
-            } catch (IOException e) {
-                throw new ValueHandlerException(e);
+                body = XLPIOUtil.toString(inputStream,false,
+                        XLPStringUtil.isEmpty(requestCharsetName) 
+                        ? XLPCharsetUtil.UTF8 : requestCharsetName);
+            } catch (Exception e) {
+                if (LOGGER.isErrorEnabled()){
+                    LOGGER.error("解析请求体出错", e);
+                }
             }
             parameterValue = ValueUtils.requestBodyConvert(body, parameterInfo.getParameterClass());
         }
