@@ -66,14 +66,14 @@ public class RequestPathUtils {
         String[] names;
         int startIndex, endIndex;
         PathVariableUriCompare compare;
-        for (int i = 0, len = paths1.length; i < len; i++) {
+        out: for (int i = 0, len = paths1.length; i < len; i++) {
             endIndex = 0;
             //判断controller中RequestMapping的路径是否包含${[A-Za-z]+[A-Za-z0-9]*}值
             names = XLPStringUtil.findSubStrings(paths2[i], "\\{[A-Za-z]+[A-Za-z0-9]*\\}");
             if ( names.length > 0){
                 compare = new PathVariableUriCompare();
                 for (String name : names) {
-                    if (name.length() == paths2[i].length()) return true;
+                    if (name.length() == paths2[i].length()) break out;
                     startIndex = paths2[i].indexOf(name, endIndex);
                     if(!compare.compare(paths2[i].substring(endIndex, startIndex), paths1[i],
                             endIndex == 0, false)){
