@@ -73,7 +73,7 @@ public class RequestPathUtils {
             if ( names.length > 0){
                 compare = new PathVariableUriCompare();
                 for (String name : names) {
-                    if (name.length() == paths2[i].length()) break;
+                    if (name.length() == paths2[i].length()) return true;
                     startIndex = paths2[i].indexOf(name, endIndex);
                     if(!compare.compare(paths2[i].substring(endIndex, startIndex), paths1[i],
                             endIndex == 0, false)){
