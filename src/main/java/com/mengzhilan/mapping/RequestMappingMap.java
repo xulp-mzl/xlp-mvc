@@ -132,9 +132,6 @@ public class RequestMappingMap {
                     Parameter[] parameters = method.getParameters();
                     methodPath = requestMapping.value();
                     completedPath = RequestPathUtils.mergePath(classPath, methodPath);
-                    if (completedPath.endsWith("/")){
-                        completedPath = completedPath.substring(0, completedPath.length() -1);
-                    }
                     methodTypes1 = requestMapping.method();
                     methodTypes1 = methodTypes1[0] == RequestMethodType.ALL ? methodTypes
                            : MethodTypeUtils.convert(methodTypes1);

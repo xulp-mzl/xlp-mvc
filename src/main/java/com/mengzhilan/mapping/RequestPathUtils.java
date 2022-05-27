@@ -28,7 +28,11 @@ public class RequestPathUtils {
             return classPath + methodPath.substring(1);
         if (!methodPath.startsWith("/") && !classPath.endsWith("/"))
             return classPath + "/" + methodPath;
-        return classPath + methodPath;
+        String mergePath = classPath + methodPath;
+        if (mergePath.endsWith("/")){
+            mergePath = mergePath.substring(0, mergePath.length() -1);
+        }
+        return mergePath;
     }
 
     /**
