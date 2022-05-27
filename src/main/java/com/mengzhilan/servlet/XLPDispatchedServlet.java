@@ -64,6 +64,9 @@ public class XLPDispatchedServlet extends HttpServlet {
         uri = URLDecoder.decode(uri, XLPCharsetUtil.UTF8);
         //访问路径key
         String path = RequestPathUtils.removeContextPathFromUri(contextPath, uri);
+        if (path.endsWith("/")){
+            path = path.substring(0, path.length() -1);
+        }
         String pathKey = path +  "_" + requestMethodType.name();
         RequestMappingInfo info = RequestMappingMap.getRequestMappingInfo(pathKey);
         if(info == null){
