@@ -67,8 +67,7 @@ public class XLPDispatchedServlet extends HttpServlet {
         		String.valueOf(XLPStringUtil.isEmpty(openExceptionHandler) || "true".equals(openExceptionHandler)));
         String openControllerMethodExcuteBeforeOfAfterDealing = config.getInitParameter(OPEN_CONTROLLER_METHOD_EXECUTE_DEALING);
         System.setProperty("xlp.open.controller.method.execute.dealing", 
-        		String.valueOf(XLPStringUtil.isEmpty(openControllerMethodExcuteBeforeOfAfterDealing) 
-        				|| "true".equals(openControllerMethodExcuteBeforeOfAfterDealing)));
+        		String.valueOf("true".equals(openControllerMethodExcuteBeforeOfAfterDealing)));
     }
 
     @Override

@@ -16,9 +16,9 @@ public interface IExceptionHandler {
 	 * 
 	 * @param request
 	 * @param response
-	 * @param exception
+	 * @param throwable
 	 * @return
 	 */
 	Object exceptionHandle(ServletRequest request, ServletResponse response, 
-			Exception exception);
+			Throwable throwable);
 }

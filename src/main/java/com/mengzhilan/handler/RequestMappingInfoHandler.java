@@ -2,6 +2,8 @@ package com.mengzhilan.handler;
 
 import com.mengzhilan.annotation.RequestCharset;
 import com.mengzhilan.annotation.ResponseCharset;
+import com.mengzhilan.exception.ExceptionHandler;
+import com.mengzhilan.exception.ExceptionHandlerHelper;
 import com.mengzhilan.mapping.RequestMappingInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,15 +95,31 @@ public class RequestMappingInfoHandler implements Handler {
             }
         }
 
+        //是否开启异常处理，开启了，则用用户给定的处理器进行处理异常，并把处理后的异常返回给客户端
+        boolean openExceptionHandler = "true".equals(System.getProperty("xlp.open.controller.exception.handler"));
+        //是否开启controller函数调用前后进行自定义操作
+        boolean openControllerMethodExcuteBeforeOfAfterDealing =
+        		"true".equals(System.getProperty("xlp.open.controller.method.execute.dealing"));
+        
         Object returnValue;
         try {
             returnValue = method.invoke(instance, values);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             if (LOGGER.isErrorEnabled()){
                 LOGGER.error(info + "处理异常", e);
             }
             throw new RequestMappingInfoHandlerException(info + "处理异常", e);
-        }
+        } catch (InvocationTargetException e) {
+        	if (LOGGER.isErrorEnabled()){
+                LOGGER.error(info + "处理异常", e);
+            }
+			if (!openExceptionHandler) { 
+				throw new RequestMappingInfoHandlerException(info + "处理异常", e);
+			}
+			returnValue = ExceptionHandlerHelper.handleException(request, response, 
+					e.getTargetException(), 
+					info.getControllerClass().getAnnotation(ExceptionHandler.class));
+		}
         return returnValue;
     }
 
