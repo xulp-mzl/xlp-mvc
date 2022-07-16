@@ -130,10 +130,10 @@ public class RequestMappingInfoHandler implements Handler {
             }
             throw new RequestMappingInfoHandlerException(info + "处理异常", e);
         } catch (InvocationTargetException e) {
-        	if (LOGGER.isErrorEnabled()){
-                LOGGER.error(info + "处理异常", e);
-            }
 			if (!openExceptionHandler) { 
+				if (LOGGER.isErrorEnabled()){
+	                LOGGER.error(info + "处理异常", e);
+	            }
 				throw new RequestMappingInfoHandlerException(info + "处理异常", e);
 			}
 			//异常处理
