@@ -3,17 +3,23 @@
 ### com.mengzhilan.servlet.XLPDispatchedServlet可配置参数（在web.xml里配置）
 ```
 1.configDefault： 值为true时，配置了自定义处理器（配置自定义处理器时，暂不支持该功能），否则没有
-2.openExceptionHandler：是否开启controller异常处理功能， true开启，false不开启，
-默认值为true，该参数值最后会保存到[System.setProperty("xlp.open.controller.exception.handler", value)]
-3.openControllerMethodExcuteBeforeOfAfterDealing：是否开启controller函数调用前后进行自定义操作，
-true开启，false不开启，该参数值最后会保存到[System.setProperty("xlp.open.controller.method.execute.dealing", value)]
 ```
 
-### 模型对应表单配置类
+### 系统配置
 ```
-com.mengzhilan.form.FormConfig.reload();
+1.System.setProperty("xlp.open.controller.exception.handler", "true") 
+统一开启异常处理
+
+2.System.setProperty("xlp.controller.exception.handler.impl", "com.mengzhilan.exception.IExceptionHandler 实现类全路径")
+统一设置异常处理实现类
+
+3.System.setProperty("xlp.open.controller.method.execute.dealing", "true")
+开启Controller函数调用前后进行自定义操作
+
+4.System.setProperty("xlp.controller.method.execute.before", "com.mengzhilan.aop.IBefore 实现类全路径")
+统一设置Controller函数调用前进行自定义操作实现类
+
+5.System.setProperty("xlp.controller.method.execute.after", "com.mengzhilan.aop.IAfter 实现类全路径")
+统一设置Controller函数调用后进行自定义操作实现类
 ```
-#可清除缓存类
-```
-com.mengzhilan.util.ModelBaseConfigReaderUtils.clearCache();
-```
+

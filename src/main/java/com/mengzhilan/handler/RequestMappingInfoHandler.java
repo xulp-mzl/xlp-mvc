@@ -2,6 +2,12 @@ package com.mengzhilan.handler;
 
 import com.mengzhilan.annotation.RequestCharset;
 import com.mengzhilan.annotation.ResponseCharset;
+import com.mengzhilan.aop.After;
+import com.mengzhilan.aop.Before;
+import com.mengzhilan.aop.EnableMethodEnhanceService;
+import com.mengzhilan.aop.MethodEnhanceServiceHelper;
+import com.mengzhilan.constant.Constants;
+import com.mengzhilan.exception.EnableExceptionHandler;
 import com.mengzhilan.exception.ExceptionHandler;
 import com.mengzhilan.exception.ExceptionHandlerHelper;
 import com.mengzhilan.mapping.RequestMappingInfo;
@@ -43,8 +49,9 @@ public class RequestMappingInfoHandler implements Handler {
         }
 
         Object instance;
+        Class<?> controllerClass = info.getControllerClass();
         try {
-            instance = info.getControllerClass().newInstance();
+            instance = controllerClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             if (LOGGER.isErrorEnabled()){
                 LOGGER.error(info + "处理异常", e);
@@ -54,7 +61,7 @@ public class RequestMappingInfoHandler implements Handler {
 
         Method method;
         try {
-            method = info.getControllerClass().getMethod(info.getMethodName(),
+            method = controllerClass.getMethod(info.getMethodName(),
                     info.getMethodParams());
         } catch (NoSuchMethodException e) {
             if (LOGGER.isErrorEnabled()){
@@ -96,14 +103,27 @@ public class RequestMappingInfoHandler implements Handler {
         }
 
         //是否开启异常处理，开启了，则用用户给定的处理器进行处理异常，并把处理后的异常返回给客户端
-        boolean openExceptionHandler = "true".equals(System.getProperty("xlp.open.controller.exception.handler"));
+        boolean openExceptionHandler = controllerClass.getAnnotation(EnableExceptionHandler.class) != null
+        		|| "true".equals(System.getProperty(Constants.OPEN_EXCEPTION_HANDLER_KEY));
+       
         //是否开启controller函数调用前后进行自定义操作
         boolean openControllerMethodExcuteBeforeOfAfterDealing =
-        		"true".equals(System.getProperty("xlp.open.controller.method.execute.dealing"));
+        		controllerClass.getAnnotation(EnableMethodEnhanceService.class) != null
+        		|| "true".equals(System.getProperty(Constants.OPEN_CONTROLLER_METHOD_EXECUTE_DEALING));
         
         Object returnValue;
+        if (openControllerMethodExcuteBeforeOfAfterDealing) {
+        	//函数增强前处理
+			MethodEnhanceServiceHelper.before(request, response, 
+					controllerClass, method, method.getAnnotation(Before.class), values);
+		}
         try {
             returnValue = method.invoke(instance, values);
+            //函数增强后处理
+            if (openControllerMethodExcuteBeforeOfAfterDealing) {
+    			MethodEnhanceServiceHelper.after(request, response, controllerClass, 
+    					method, null, method.getAnnotation(After.class), values);
+    		}
         } catch (IllegalAccessException e) {
             if (LOGGER.isErrorEnabled()){
                 LOGGER.error(info + "处理异常", e);
@@ -116,9 +136,18 @@ public class RequestMappingInfoHandler implements Handler {
 			if (!openExceptionHandler) { 
 				throw new RequestMappingInfoHandlerException(info + "处理异常", e);
 			}
+			//异常处理
+			ExceptionHandler exceptionHandler = method.getAnnotation(ExceptionHandler.class);
+			exceptionHandler = exceptionHandler != null ? exceptionHandler
+					: controllerClass.getAnnotation(ExceptionHandler.class);
 			returnValue = ExceptionHandlerHelper.handleException(request, response, 
-					e.getTargetException(), 
-					info.getControllerClass().getAnnotation(ExceptionHandler.class));
+					e.getTargetException(), exceptionHandler);
+			//函数增强后处理
+            if (openControllerMethodExcuteBeforeOfAfterDealing) {
+    			MethodEnhanceServiceHelper.after(request, response, controllerClass, 
+    					method, e.getTargetException(), method.getAnnotation(After.class),
+    					values);
+    		}
 		}
         return returnValue;
     }

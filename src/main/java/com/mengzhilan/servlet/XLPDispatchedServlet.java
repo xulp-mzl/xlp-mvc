@@ -1,25 +1,25 @@
 package com.mengzhilan.servlet;
 
-import com.mengzhilan.enumeration.RequestMethodType;
-import com.mengzhilan.handler.ParameterNotExistException;
-import com.mengzhilan.handler.RequestMappingInfoHandler;
-import com.mengzhilan.mapping.RequestMappingInfo;
-import com.mengzhilan.mapping.RequestMappingMap;
-import com.mengzhilan.mapping.RequestPathUtils;
-
-import org.xlp.json.Json;
-import org.xlp.utils.XLPCharsetUtil;
-import org.xlp.utils.XLPPackingTypeUtil;
-import org.xlp.utils.XLPStringUtil;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.Locale;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.Locale;
+
+import org.xlp.json.Json;
+import org.xlp.utils.XLPCharsetUtil;
+import org.xlp.utils.XLPPackingTypeUtil;
+
+import com.mengzhilan.enumeration.RequestMethodType;
+import com.mengzhilan.handler.ParameterNotExistException;
+import com.mengzhilan.handler.RequestMappingInfoHandler;
+import com.mengzhilan.mapping.RequestMappingInfo;
+import com.mengzhilan.mapping.RequestMappingMap;
+import com.mengzhilan.mapping.RequestPathUtils;
 
 /**
  * Create by xlp on 2022/01/01
@@ -44,30 +44,11 @@ public class XLPDispatchedServlet extends HttpServlet {
      */
     public boolean hasConfiguredDefaultServlet = false;
     
-    /**
-     * 是否开启controller异常处理功能， true开启，false不开启，
-	 * 默认值为true，该参数值最后会保存到[System.setProperty("xlp.open.controller.exception.handler", value)]
-     */
-    public static final String OPEN_EXCEPTION_HANDLER = "openExceptionHandler";
-    
-    
-    /**
-     * 是否开启controller函数调用前后进行自定义操作，
-	 * true开启，false不开启，该参数值最后会保存到[System.setProperty("xlp.open.controller.method.execute.dealing", value)]
-     */
-    public static final String OPEN_CONTROLLER_METHOD_EXECUTE_DEALING = "openControllerMethodExcuteBeforeOfAfterDealing";
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         String initParameter = config.getInitParameter(HAS_CONFIGURE_DDEFAULT_SERVLET_PARAETER);
         hasConfiguredDefaultServlet = "true".equals(initParameter);
-        String openExceptionHandler = config.getInitParameter(OPEN_EXCEPTION_HANDLER);
-        System.setProperty("xlp.open.controller.exception.handler", 
-        		String.valueOf(XLPStringUtil.isEmpty(openExceptionHandler) || "true".equals(openExceptionHandler)));
-        String openControllerMethodExcuteBeforeOfAfterDealing = config.getInitParameter(OPEN_CONTROLLER_METHOD_EXECUTE_DEALING);
-        System.setProperty("xlp.open.controller.method.execute.dealing", 
-        		String.valueOf("true".equals(openControllerMethodExcuteBeforeOfAfterDealing)));
     }
 
     @Override
