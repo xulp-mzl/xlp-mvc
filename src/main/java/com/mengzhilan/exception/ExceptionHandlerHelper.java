@@ -21,19 +21,23 @@ public class ExceptionHandlerHelper {
 			Throwable throwable, ExceptionHandler exceptionHandler){
 		if (exceptionHandler == null) return null;
 		//获取异常处理实现类
-		Class<?> exceptionHandlerClass = exceptionHandler.getClass();
-		if (exceptionHandlerClass == null) {
-			String exceptionHandlerClassName = exceptionHandler.exceptionHandlerClassName();
-			if (!XLPStringUtil.isEmpty(exceptionHandlerClassName)) {
-				try {
-					exceptionHandlerClass = Class.forName(exceptionHandlerClassName);
-				} catch (ClassNotFoundException e) {
-					if (LOGGER.isErrorEnabled()) {
-						LOGGER.error("加载异常处理类失败：", e); 
-					}
+		Class<?> exceptionHandlerClass = null;
+		
+		String exceptionHandlerClassName = exceptionHandler.exceptionHandlerClassName();
+		if (!XLPStringUtil.isEmpty(exceptionHandlerClassName)) {
+			try {
+				exceptionHandlerClass = Class.forName(exceptionHandlerClassName);
+			} catch (ClassNotFoundException e) {
+				if (LOGGER.isErrorEnabled()) {
+					LOGGER.error("加载异常处理类失败：", e); 
 				}
 			}
+		}
+		
+		if (exceptionHandlerClass == null) {
+			exceptionHandlerClass = exceptionHandler.getClass();
 		} 
+		
 		if (exceptionHandlerClass == null) { 
 			if (LOGGER.isWarnEnabled()) {
 				LOGGER.warn("没有获取到异常处理实现类"); 
