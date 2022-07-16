@@ -32,14 +32,15 @@ public class MethodEnhanceServiceHelper {
 	 */
 	public static void before(ServletRequest request, ServletResponse response, 
 			Class<?> target, Method method, Before before, Object ...parameters){
-		if (before == null) return;
 		
 		Class<?> ibeforeClass = null;
-		String ibeforeClassName = before.beforeClassName();
-		ibeforeClass = createExceptionHandler(ibeforeClassName);
-		
-		if (ibeforeClass == null) {
-			ibeforeClass = before.value();
+		if (before != null) {
+			String ibeforeClassName = before.beforeClassName();
+			ibeforeClass = createExceptionHandler(ibeforeClassName);
+			
+			if (ibeforeClass == null) {
+				ibeforeClass = before.value();
+			}
 		}
 		
 		// 如果没有获取到实现类则从系统设置中获取
@@ -80,14 +81,15 @@ public class MethodEnhanceServiceHelper {
 	public static void after(ServletRequest request, ServletResponse response, 
 			Class<?> target, Method method, Throwable throwable, 
 			After after, Object ...parameters){
-		if (after == null) return;
 		
-		Class<?> iafterClass = null; 
-		String iafterClassName = after.afterClassName(); 
-		iafterClass = createExceptionHandler(iafterClassName);
-		
-		if (iafterClass == null) {
-			iafterClass = after.value();
+		Class<?> iafterClass = null;
+		if (after != null) {
+			String iafterClassName = after.afterClassName(); 
+			iafterClass = createExceptionHandler(iafterClassName);
+			
+			if (iafterClass == null) {
+				iafterClass = after.value();
+			}
 		}
 		
 		// 如果没有获取到实现类则从系统设置中获取

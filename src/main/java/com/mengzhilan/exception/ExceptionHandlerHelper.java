@@ -21,17 +21,18 @@ public class ExceptionHandlerHelper {
 	
 	public static Object handleException(ServletRequest request, ServletResponse response, 
 			Throwable throwable, ExceptionHandler exceptionHandler){
-		if (exceptionHandler == null) return null;
 		
 		Class<?> exceptionHandlerClass = null;
-		//获取异常处理实现类
-		String exceptionHandlerClassName = exceptionHandler.exceptionHandlerClassName();
-		exceptionHandlerClass = createExceptionHandler(exceptionHandlerClassName);
-		
-		if (exceptionHandlerClass == null) {
+		if (exceptionHandler != null) { 
 			//获取异常处理实现类
-			exceptionHandlerClass = exceptionHandler.value();
-		} 
+			String exceptionHandlerClassName = exceptionHandler.exceptionHandlerClassName();
+			exceptionHandlerClass = createExceptionHandler(exceptionHandlerClassName);
+			
+			if (exceptionHandlerClass == null) {
+				//获取异常处理实现类
+				exceptionHandlerClass = exceptionHandler.value();
+			} 
+		}
 		
 		// 如果没有获取到异常处理实现类则从系统设置中获取
 		if (exceptionHandlerClass == null || exceptionHandlerClass == IExceptionHandler.class) { 
