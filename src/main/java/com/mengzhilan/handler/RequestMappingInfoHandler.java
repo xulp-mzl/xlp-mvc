@@ -70,7 +70,7 @@ public class RequestMappingInfoHandler implements Handler {
             throw new RequestMappingInfoHandlerException(info + "处理异常", e);
         }
         //设置请求和响应编码
-        setResAndRespCharsetName(request, response, method);
+        setResAndRespCharsetName(request, response, method, controllerClass);
 
         Parameter[] parameters = info.getParameters();
         Class<?>[] parameterClass = info.getMethodParams();
@@ -112,17 +112,22 @@ public class RequestMappingInfoHandler implements Handler {
         		|| "true".equals(System.getProperty(Constants.OPEN_CONTROLLER_METHOD_EXECUTE_DEALING));
         
         Object returnValue;
+        After after = null;
         if (openControllerMethodExcuteBeforeOfAfterDealing) {
         	//函数增强前处理
-			MethodEnhanceServiceHelper.before(request, response, 
-					controllerClass, method, method.getAnnotation(Before.class), values);
+        	Before before = method.getAnnotation(Before.class);
+        	before = before == null ? controllerClass.getAnnotation(Before.class) : before;
+			MethodEnhanceServiceHelper.before(request, response, controllerClass, method, 
+					before, values);
+			after = method.getAnnotation(After.class);
+			after = after == null ? controllerClass.getAnnotation(After.class) : after;
 		}
         try {
             returnValue = method.invoke(instance, values);
             //函数增强后处理
             if (openControllerMethodExcuteBeforeOfAfterDealing) {
     			MethodEnhanceServiceHelper.after(request, response, controllerClass, 
-    					method, null, method.getAnnotation(After.class), values);
+    					method, null, after, values);
     		}
         } catch (IllegalAccessException e) {
             if (LOGGER.isErrorEnabled()){
@@ -145,8 +150,7 @@ public class RequestMappingInfoHandler implements Handler {
 			//函数增强后处理
             if (openControllerMethodExcuteBeforeOfAfterDealing) {
     			MethodEnhanceServiceHelper.after(request, response, controllerClass, 
-    					method, e.getTargetException(), method.getAnnotation(After.class),
-    					values);
+    					method, e.getTargetException(), after, values);
     		}
 		}
         return returnValue;
@@ -158,9 +162,14 @@ public class RequestMappingInfoHandler implements Handler {
      * @param request
      * @param response
      * @param method
+     * @param controllerClass
      */
-    private void setResAndRespCharsetName(HttpServletRequest request, HttpServletResponse response, Method method) {
+    private void setResAndRespCharsetName(HttpServletRequest request, HttpServletResponse response, 
+    		Method method, Class<?> controllerClass) {
         RequestCharset requestCharset = method.getAnnotation(RequestCharset.class);
+        if (requestCharset == null) {
+			requestCharset = controllerClass.getAnnotation(RequestCharset.class);
+		}
         String charsetName;
         if (requestCharset != null && !XLPStringUtil.isEmpty(charsetName = requestCharset.value())){
             try {
@@ -173,6 +182,9 @@ public class RequestMappingInfoHandler implements Handler {
         }
 
         ResponseCharset responseCharset = method.getAnnotation(ResponseCharset.class);
+        if (responseCharset == null) {
+        	responseCharset = controllerClass.getAnnotation(ResponseCharset.class);
+		}
         if (responseCharset != null && !XLPStringUtil.isEmpty(charsetName = responseCharset.value())){
             response.setCharacterEncoding(charsetName);
             response.setContentType("text/html;charset=" + charsetName);

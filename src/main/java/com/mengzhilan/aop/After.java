@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * @Description 函数执行后要执行另一些操作注解
 */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Documented
 public @interface After {
 	/**
