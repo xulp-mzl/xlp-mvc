@@ -61,7 +61,7 @@ public class ParameterInfoBuilder {
                 String parameterName = requestParam.value().trim();
                 if (parameterName.isEmpty()) {
                 	 parameterName = parameter.getName();
-                	 if (parameterName.startsWith("arg" + asmHandler.getCurrentIndex())) {
+                	 if (parameterName.equals("arg" + asmHandler.getCurrentIndex())) {
 						asmHandler.handle();
 						parameterName = asmHandler.getMethodParameterNameOfCurrentIndex();
 						parameterName = parameterName == null ? parameter.getName() : parameterName;
@@ -144,7 +144,7 @@ public class ParameterInfoBuilder {
                 
                 if (parameterName.isEmpty()) {
 	               	 parameterName = parameter.getName();
-	               	 if (parameterName.startsWith("arg" + asmHandler.getCurrentIndex())) {
+	               	 if (parameterName.equals("arg" + asmHandler.getCurrentIndex())) {
 							asmHandler.handle();
 							parameterName = asmHandler.getMethodParameterNameOfCurrentIndex();
 							parameterName = parameterName == null ? parameter.getName() : parameterName;
