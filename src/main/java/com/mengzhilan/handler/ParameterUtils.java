@@ -13,10 +13,12 @@ class ParameterUtils {
      * 为接下来解析@{@link com.mengzhilan.annotation.RequestMapping}映射做准备
      *
      * @param parameter
+     * @param asmHandler
      * @return ParameterInfo对象
      */
-    static ParameterInfoBuilder.ParameterInfo getParameterInfo(Parameter parameter){
-       return ParameterInfoBuilder.builder(parameter).requestParam()
+    static ParameterInfoBuilder.ParameterInfo getParameterInfo(Parameter parameter,
+    		MethodParameterASMHandler asmHandler){
+       return ParameterInfoBuilder.builder(parameter, asmHandler).requestParam()
                .requestHeader().pathVariable()
                .requestBody().requestBean().getParameterInfo();
     }

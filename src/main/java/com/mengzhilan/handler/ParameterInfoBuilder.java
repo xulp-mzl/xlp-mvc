@@ -26,22 +26,27 @@ public class ParameterInfoBuilder {
      */
     private Parameter parameter;
 
+    private MethodParameterASMHandler asmHandler;
+    
     /**
      * @param parameter
      */
-    private ParameterInfoBuilder(Parameter parameter){
+    private ParameterInfoBuilder(Parameter parameter, MethodParameterASMHandler asmHandler){
         hasCreateParameterInfo = (parameter == null);
         this.parameter = parameter;
+        this.asmHandler = asmHandler;
     }
 
     /**
      * 创建<code>ParameterInfoBuilder</code>对象
      *
      * @param parameter
+     * @param asmHandler
      * @return
      */
-    public static ParameterInfoBuilder builder(Parameter parameter){
-        return new ParameterInfoBuilder(parameter);
+    public static ParameterInfoBuilder builder(Parameter parameter,
+    		MethodParameterASMHandler asmHandler){
+        return new ParameterInfoBuilder(parameter, asmHandler);
     }
 
     /**
@@ -54,7 +59,14 @@ public class ParameterInfoBuilder {
             RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
             if (requestParam != null){
                 String parameterName = requestParam.value().trim();
-                parameterName = parameterName.isEmpty() ? parameter.getName() : parameterName;
+                if (parameterName.isEmpty()) {
+                	 parameterName = parameter.getName();
+                	 if (parameterName.startsWith("arg" + asmHandler.getCurrentIndex())) {
+						asmHandler.handle();
+						parameterName = asmHandler.getMethodParameterNameOfCurrentIndex();
+						parameterName = parameterName == null ? parameter.getName() : parameterName;
+					 }
+				}
                 parameterInfo = new ParameterInfo(RequestParam.class, parameterName, requestParam.required(),
                         parameter.getType());
                 hasCreateParameterInfo = true;
@@ -129,7 +141,16 @@ public class ParameterInfoBuilder {
             RequestBean requestBean = parameter.getAnnotation(RequestBean.class);
             if (requestBean != null){
                 String parameterName = requestBean.value().trim();
-                parameterName = parameterName.isEmpty() ? parameter.getName() : parameterName;
+                
+                if (parameterName.isEmpty()) {
+	               	 parameterName = parameter.getName();
+	               	 if (parameterName.startsWith("arg" + asmHandler.getCurrentIndex())) {
+							asmHandler.handle();
+							parameterName = asmHandler.getMethodParameterNameOfCurrentIndex();
+							parameterName = parameterName == null ? parameter.getName() : parameterName;
+					 }
+				}
+                
                 parameterInfo = new ParameterInfo(RequestBean.class, parameterName, requestBean.required(),
                         parameter.getType());
                 hasCreateParameterInfo = true;
@@ -194,6 +215,9 @@ public class ParameterInfoBuilder {
             this.annotationClass = annotationClass;
         }
 
+        /**
+         * 获取函数参数名称
+         */
         public String getName() {
             return name;
         }

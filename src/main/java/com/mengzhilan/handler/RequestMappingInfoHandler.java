@@ -76,6 +76,9 @@ public class RequestMappingInfoHandler implements Handler {
         Class<?>[] parameterClass = info.getMethodParams();
         Object[] values = new Object[parameterClass.length];
         ParameterInfoBuilder.ParameterInfo parameterInfo;
+        
+        MethodParameterASMHandler asmHandler = new MethodParameterASMHandler(method);
+        
         for (int i = 0, len = parameterClass.length; i < len; i++) {
             //排除HttpServletResponse和HttpServletRequest
             if (parameterClass[i].isAssignableFrom(HttpServletResponse.class)){
@@ -86,7 +89,9 @@ public class RequestMappingInfoHandler implements Handler {
                 values[i] = request;
                 continue;
             }
-            parameterInfo = ParameterUtils.getParameterInfo(parameters[i]);
+            
+            asmHandler.setCurrentIndex(i);
+            parameterInfo = ParameterUtils.getParameterInfo(parameters[i], asmHandler);
             if (parameterInfo == null){
                 values[i] = ValueUtils.PRIMITIVE_DEFAULTS.get(parameterClass[i]);
                 continue;
