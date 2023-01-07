@@ -51,10 +51,9 @@ public class XLPDispatchedServlet extends HttpServlet {
         hasConfiguredDefaultServlet = "true".equals(initParameter);
     }
 
-    @Override
-    protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
-            throws ServletException, IOException {
-        //获取请求方式
+	protected void doService(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+			throws IOException, ServletException {
+		//获取请求方式
         String requestMethod = httpServletRequest.getMethod().toUpperCase(Locale.ENGLISH);
         //把请求方式转换成枚举类型
         RequestMethodType requestMethodType = RequestMethodType.valueOf(requestMethod);
@@ -117,5 +116,40 @@ public class XLPDispatchedServlet extends HttpServlet {
                         .forward(httpServletRequest, httpServletResponse);
             }
         }
-    }
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
+
+	@Override
+	protected void doTrace(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		doService(req, resp);
+	}
 }
