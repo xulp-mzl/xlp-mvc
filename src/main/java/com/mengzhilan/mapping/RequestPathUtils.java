@@ -4,6 +4,8 @@ import org.xlp.utils.XLPStringUtil;
 
 import java.util.Objects;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Create by xlp on 2021/12/8
  */
@@ -94,4 +96,26 @@ public class RequestPathUtils {
         }
         return true;
     }
+    
+    /**
+	 * 获取包含协议IP端口号的完整上下文
+	 * @param request
+	 * @return 示例：https://xxxx:80/bbb/
+	 */
+	public static String getFullContextPath(HttpServletRequest request){
+		String url = request.getScheme()+ "://" + request.getServerName()
+			+ ":" + request.getServerPort();
+		String contextPath = request.getContextPath();
+		if (contextPath.startsWith("/") && contextPath.length() == 1) {
+			return url + contextPath;
+		}
+		if (!contextPath.startsWith("/")) {
+			url += "/";
+		}
+		url += contextPath;
+		if (!contextPath.endsWith("/")) {
+			url += "/";
+		}
+		return url;
+	}
 }

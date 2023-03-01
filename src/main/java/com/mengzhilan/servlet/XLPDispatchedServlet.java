@@ -44,6 +44,16 @@ public class XLPDispatchedServlet extends HttpServlet {
      */
     public boolean hasConfiguredDefaultServlet = false;
     
+    /**
+     * 路径转发前缀
+     */
+    public static final String DISPATCHER_PREFIX = "dispatcher:";
+    
+    /**
+     * 路径重定向前缀
+     */
+    public static final String REDIRECT_PREFIX = "redirect:";
+    
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -92,6 +102,27 @@ public class XLPDispatchedServlet extends HttpServlet {
                 if (value != null){
                 	 String response;
                      Class<?> cs = value.getClass();
+                     
+                     if (value instanceof CharSequence) {
+                    	response = value.toString(); 
+                    	//请求转发
+                    	if (response.startsWith(DISPATCHER_PREFIX)) {
+                    		httpServletRequest.getRequestDispatcher(response.substring(DISPATCHER_PREFIX.length())) 
+								.forward(httpServletRequest, httpServletResponse);
+                    		return;
+						}
+                    	//请求重定向
+                    	if (response.startsWith(REDIRECT_PREFIX)) {
+                    		String redirectUrl = response.substring(REDIRECT_PREFIX.length());
+                    		redirectUrl = RequestPathUtils.mergePath(contextPath, redirectUrl);
+                    		if (!redirectUrl.startsWith("/")) {
+                    			redirectUrl = "/" + redirectUrl;
+							}
+                    		httpServletResponse.sendRedirect(redirectUrl);
+                    		return;
+						}
+					 }
+                     
                      // 判断返回值是否是数字类型，或基础类型，或包装类型，或字符串类型
                      if (XLPPackingTypeUtil.isNumber(value)
                          || XLPPackingTypeUtil.isOtherRawOrPackingType(cs)
