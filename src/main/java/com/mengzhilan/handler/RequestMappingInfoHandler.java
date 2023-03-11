@@ -81,11 +81,11 @@ public class RequestMappingInfoHandler implements Handler {
         
         for (int i = 0, len = parameterClass.length; i < len; i++) {
             //排除HttpServletResponse和HttpServletRequest
-            if (parameterClass[i].isAssignableFrom(HttpServletResponse.class)){
+            if (HttpServletResponse.class.isAssignableFrom(parameterClass[i])){
                 values[i] = response;
                 continue;
             }
-            if (parameterClass[i].isAssignableFrom(HttpServletRequest.class)){
+            if (HttpServletRequest.class.isAssignableFrom(parameterClass[i])){
                 values[i] = request;
                 continue;
             }
