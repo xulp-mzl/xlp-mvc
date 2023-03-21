@@ -83,8 +83,9 @@ public class RequestMappingMap {
     /**
      * 加载所有的controller注解类信息
      *
-     * @param classLoader
-     * @param packagePath
+     * @param classLoader 类加载器
+     * @param packagePath 包名
+     * @throws IOException 假如包扫描失败，则抛出该异常
      */
     public static void loadAllController(ClassLoader classLoader, String packagePath) throws IOException {
         String[] packagePaths = XLPStringUtil.emptyTrim(packagePath).split(",");
@@ -93,12 +94,22 @@ public class RequestMappingMap {
         for (String path : packagePaths) {
             classes.addAll(scanner.scannerToClass(path));
         }
+        loadAllController(classLoader, classes);
+    }
 
-        for (Class<?> cs : classes) {
+    /**
+     * 加载所有的controller注解类信息
+     *
+     * @param classLoader 类加载器
+     * @param controllerClasses Controller class 集合
+     */
+    public static void loadAllController(ClassLoader classLoader, Set<Class<?>> controllerClasses){
+    	if (controllerClasses == null) return;
+        for (Class<?> cs : controllerClasses) {
             createRequestMappingInfo(cs);
         }
     }
-
+    
     /**
      * 创建RequestMappingInfo对象
      *
